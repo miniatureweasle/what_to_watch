@@ -1,6 +1,6 @@
 # What To Watch?
 Now I never have to look long to find a good movie. By leveraging 
-Django and Scrapy I now have a fast and searchable database of over 600 000
+Django and Scrapy, I now have a fast and searchable database of over 600 000
 movies.
 
 Clicking the title takes you to a Youtube search of the movie's trailer.
