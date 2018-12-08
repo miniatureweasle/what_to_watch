@@ -36,14 +36,18 @@ class ImdbSpider(scrapy.Spider):
             release_year = movie.xpath(MOVIE_LOOKUPS['release_year']).extract_first()
             genre = movie.xpath(MOVIE_LOOKUPS['genre']).extract_first()
             votes = movie.xpath(MOVIE_LOOKUPS['votes']).extract_first() 
-           
-            # prepare for db 
+
+            # prepare for db
             genre = genre.replace('\n', '').strip()
             # if rating can't be found put it at bottom on list
             rating = float(rating) if rating else 0
-            release_year =int(re.sub('[^0-9]','', release_year)) if release_year else None
+            print(release_year)
             votes = int(re.sub('[^0-9]','', votes)) if votes else None
-            
+            try:
+                release_year = int(re.sub('[^0-9]','', release_year)) if release_year else None
+            except ValueError:
+                release_year = None
+
             Movie.objects.update_or_create(
                 title = title,
                 rating = rating,
@@ -51,11 +55,16 @@ class ImdbSpider(scrapy.Spider):
                 genre = genre,
                 votes = votes
             )
-            yield {'title': title, 'genre': genre, 'release_year': release_year, 'rating': rating, 'votes': votes,}
+            yield {
+                'title': title,
+                'genre': genre,
+                'release_year': release_year,
+                'rating': rating,
+                'votes': votes
+            }
 
         next_page = response.xpath("//a[@class='lister-page-next next-page']/@href").extract_first()
         if next_page is not None:
             next_page = next_page.replace('&amp;','&')
             url = response.urljoin(next_page)
             yield scrapy.Request(url=url, callback=self.parse)
-            
